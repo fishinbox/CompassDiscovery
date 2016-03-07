@@ -13,8 +13,12 @@ mkdir -p ${BASEDIR}/tmp/target
 get_dependencies ()
 {
 	app=${1}
-	wget ${tcz_repo}${app} -O ${app}
-	deplist=`wget -q -O - ${tcz_repo}${app}.dep 2>/dev/null`
+	echo app is ${app}
+	curl ${tcz_repo}${app} -o ${app}
+	echo app dependencies are ${tcz_repo}${app}.dep
+	deplist=`curl -fs ${tcz_repo}${app}.dep 2>/dev/null`
+	echo deplist is
+	echo ${deplist}
 	for depapp in $deplist; do
 		get_dependencies $depapp 
 	done
@@ -23,35 +27,37 @@ get_dependencies ()
 
 mkdir ${BASEDIR}/tmp/src/iso
 cd ${BASEDIR}/tmp/src/iso
-wget ${release} -O core.iso
+curl ${release} -o core.iso
 
 
 mkdir ${BASEDIR}/tmp/src/tczs
 cd ${BASEDIR}/tmp/src/tczs 
-get_dependencies ${dependencies}
-
+IFS=',' read -ra DEPS <<< ${dependencies}
+for i in ${DEPS[@]}; do
+	get_dependencies $i
+done
 # start working
 # iso root
 # TODO
 
 echo 'doing squash'
-mkdir -p ${BASEDIR}/tmp/working/squashfs-root/
-cd ${BASEDIR}/tmp/working/squashfs-root/
+mkdir -p ${BASEDIR}/tmp/working/
 # unsquash tcz
 ls ${BASEDIR}/tmp/src/tczs/
 for i in $( ls ${BASEDIR}/tmp/src/tczs/ ); do
 	if [ -f ${BASEDIR}/tmp/src/tczs/$i ]; then
 		echo 
 		echo ${BASEDIR}/tmp/src/tczs/$i
-		unsquashfs -f ${BASEDIR}/tmp/src/tczs/$i
+		unsquashfs -d ${BASEDIR}/tmp/working/squashfs-root/ -f ${BASEDIR}/tmp/src/tczs/$i
 	fi
 done
 
-for i in $(find -name *.tar.gz); do
+# TODO 2nd time extract
+for i in $(find ${BASEDIR} -path ${BASEDIR}/tmp/working/squashfs-root/*.tar.gz); do
 	echo $i
 	tar xf $i -C ${BASEDIR}/tmp/working/squashfs-root/
 done
-# TODO 2nd time extract
+
 # clean
 #rm -r ${BASEDIR}/tmp
 
