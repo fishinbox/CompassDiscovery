@@ -13,20 +13,19 @@ mkdir -p ${BASEDIR}/tmp/target
 get_dependencies ()
 {
 	app=${1}
-	echo app is ${app}
-	curl ${tcz_repo}${app} -o ${BASEDIR}/tmp/src/tczs/${app}
-	echo app dependencies are ${tcz_repo}${app}.dep
+	curl -s ${tcz_repo}${app} -o ${BASEDIR}/tmp/src/tczs/${app}
+	#echo ${app} dependencies are ${app}.dep
 	deplist=`curl -fs ${tcz_repo}${app}.dep 2>/dev/null`
-	echo deplist is
-	echo ${deplist}
+	echo ${app} deplist is
 	for depapp in $deplist; do
+		echo $depapp
 		get_dependencies $depapp 
 	done
 }
 
 
 mkdir -p ${BASEDIR}/tmp/src/iso
-curl ${release} -o ${BASEDIR}/tmp/src/iso/core.iso
+curl -s ${release} -o ${BASEDIR}/tmp/src/iso/core.iso
 
 
 mkdir -p ${BASEDIR}/tmp/src/tczs
@@ -54,7 +53,7 @@ for i in $( ls ${BASEDIR}/tmp/src/tczs/ ); do
 	if [ -f ${BASEDIR}/tmp/src/tczs/$i ]; then
 		echo 
 		echo ${BASEDIR}/tmp/src/tczs/$i
-		unsquashfs -d ${BASEDIR}/tmp/working/squashfs-root/ -f ${BASEDIR}/tmp/src/tczs/$i
+		unsquashfs -n -d ${BASEDIR}/tmp/working/squashfs-root/ -f ${BASEDIR}/tmp/src/tczs/$i
 	fi
 done
 
@@ -71,8 +70,11 @@ sudo cp -rp ${BASEDIR}/tmp/working/squashfs-root/* ${BASEDIR}/tmp/working/initfs
 # rebuild initfs image
 sudo sh -c "find | cpio -o -H newc | gzip -9 > ${BASEDIR}/tmp/working/iso/${initfs}"
 
+# make ISO image
+mkisofs -o ${BASEDIR}/tmp/target/core.iso ${BASEDIR}/tmp/working/iso/
 
 # clean
-#rm -r ${BASEDIR}/tmp
 sudo umount ${BASEDIR}/tmp/src/mnt
+rm -r ${BASEDIR}/tmp/working
+
 
