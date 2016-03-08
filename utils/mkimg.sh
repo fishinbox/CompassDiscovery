@@ -41,7 +41,12 @@ done
 mkdir ${BASEDIR}/tmp/src/mnt
 sudo mount -o loop ${BASEDIR}/tmp/src/iso/core.iso ${BASEDIR}/tmp/src/mnt
 mkdir ${BASEDIR}/tmp/working/iso
-cp -r ${BASEDIR}/tmp/src/mnt/* ${BASEDIR}/tmp/working/iso/
+sudo cp -rp ${BASEDIR}/tmp/src/mnt/* ${BASEDIR}/tmp/working/iso/
+
+# extract initfs
+mkdir -p ${BASEDIR}/tmp/working/initfs-root
+cd ${BASEDIR}/tmp/working/initfs-root
+sudo sh -c "zcat ${BASEDIR}/tmp/working/iso/${initfs} | cpio -i -H newc -d"
 
 echo 'doing squash'
 mkdir -p ${BASEDIR}/tmp/working/
