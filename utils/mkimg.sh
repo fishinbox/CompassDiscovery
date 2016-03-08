@@ -64,6 +64,14 @@ for i in $(find ${BASEDIR} -path ${BASEDIR}/tmp/working/squashfs-root/*.tar.gz);
 	tar xf $i -C ${BASEDIR}/tmp/working/squashfs-root/
 done
 
+# Copyback
+sudo cp -rp ${BASEDIR}/tmp/working/squashfs-root/* ${BASEDIR}/tmp/working/initfs-root/
+
+
+# rebuild initfs image
+sudo sh -c "find | cpio -o -H newc | gzip -9 > ${BASEDIR}/tmp/working/iso/${initfs}"
+
+
 # clean
 #rm -r ${BASEDIR}/tmp
 sudo umount ${BASEDIR}/tmp/src/mnt
