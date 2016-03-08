@@ -14,7 +14,7 @@ get_dependencies ()
 {
 	app=${1}
 	echo app is ${app}
-	curl ${tcz_repo}${app} -o ${app}
+	curl ${tcz_repo}${app} -o ${BASEDIR}/tmp/src/tczs/${app}
 	echo app dependencies are ${tcz_repo}${app}.dep
 	deplist=`curl -fs ${tcz_repo}${app}.dep 2>/dev/null`
 	echo deplist is
@@ -25,22 +25,20 @@ get_dependencies ()
 }
 
 
-mkdir ${BASEDIR}/tmp/src/iso
-cd ${BASEDIR}/tmp/src/iso
-curl ${release} -o core.iso
+mkdir -p ${BASEDIR}/tmp/src/iso
+curl ${release} -o ${BASEDIR}/tmp/src/iso/core.iso
 
 
-mkdir ${BASEDIR}/tmp/src/tczs
-cd ${BASEDIR}/tmp/src/tczs 
+mkdir -p ${BASEDIR}/tmp/src/tczs
 IFS=',' read -ra DEPS <<< ${dependencies}
 for i in ${DEPS[@]}; do
 	get_dependencies $i
 done
 # start working
 # iso root
-mkdir ${BASEDIR}/tmp/src/mnt
+mkdir -p ${BASEDIR}/tmp/src/mnt
 sudo mount -o loop ${BASEDIR}/tmp/src/iso/core.iso ${BASEDIR}/tmp/src/mnt
-mkdir ${BASEDIR}/tmp/working/iso
+mkdir -p ${BASEDIR}/tmp/working/iso
 sudo cp -rp ${BASEDIR}/tmp/src/mnt/* ${BASEDIR}/tmp/working/iso/
 
 # extract initfs
