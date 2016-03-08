@@ -38,7 +38,10 @@ for i in ${DEPS[@]}; do
 done
 # start working
 # iso root
-# TODO
+mkdir ${BASEDIR}/tmp/src/mnt
+sudo mount -o loop ${BASEDIR}/tmp/src/iso/core.iso ${BASEDIR}/tmp/src/mnt
+mkdir ${BASEDIR}/tmp/working/iso
+cp -r ${BASEDIR}/tmp/src/mnt/* ${BASEDIR}/tmp/working/iso/
 
 echo 'doing squash'
 mkdir -p ${BASEDIR}/tmp/working/
@@ -60,5 +63,5 @@ done
 
 # clean
 #rm -r ${BASEDIR}/tmp
-
+sudo umount ${BASEDIR}/tmp/src/mnt
 
