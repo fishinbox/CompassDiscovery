@@ -27,8 +27,10 @@ get_dependencies ()
 
 
 mkdir -p ${BASEDIR}/tmp/src/iso
-echo downloading iso
-curl ${release} -o ${BASEDIR}/tmp/src/iso/core.iso
+if [ "$(find ${BASEDIR}/tmp/src/iso -path */core.iso)" == "" ]; then
+	echo downloading iso
+	curl ${release} -o ${BASEDIR}/tmp/src/iso/core.iso
+fi
 
 
 mkdir -p ${BASEDIR}/tmp/src/tczs
@@ -70,8 +72,7 @@ done
 sudo cp -rp ${BASEDIR}/tmp/working/squashfs-root/* ${BASEDIR}/tmp/working/initfs-root/
 
 # Copy scripts
-sudo mkdir -p ${BASEDIR}/tmp/working/initfs-root/opt/compass/
-sudo cp -r ${BASEDIR}/../client/* ${BASEDIR}/tmp/working/initfs-root/opt/compass/
+sudo cp -r ${BASEDIR}/../client/* ${BASEDIR}/tmp/working/initfs-root/opt/
 
 # rebuild initfs image
 sudo sh -c "find | cpio -o -H newc | gzip -9 > ${BASEDIR}/tmp/working/iso/${initfs}"
