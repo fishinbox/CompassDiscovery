@@ -56,7 +56,7 @@ for i in $( ls ${BASEDIR}/tmp/src/tczs/ ); do
 	fi
 done
 
-# TODO 2nd time extract
+# 2nd time extract
 for i in $(find ${BASEDIR} -path ${BASEDIR}/tmp/working/squashfs-root/*.tar.gz); do
 	echo $i
 	tar xf $i -C ${BASEDIR}/tmp/working/squashfs-root/
@@ -65,12 +65,14 @@ done
 # Copyback
 sudo cp -rp ${BASEDIR}/tmp/working/squashfs-root/* ${BASEDIR}/tmp/working/initfs-root/
 
+# Copy scripts
+cp -r ${BASEDIR}/../client/* ${BASEDIR}/tmp/working/initfs-root/home/tc/
 
 # rebuild initfs image
 sudo sh -c "find | cpio -o -H newc | gzip -9 > ${BASEDIR}/tmp/working/iso/${initfs}"
 
 # make ISO image
-mkisofs -o ${BASEDIR}/tmp/target/core.iso ${BASEDIR}/tmp/working/iso/
+mkisofs -l -J -r -o ${BASEDIR}/tmp/target/core.iso ${BASEDIR}/tmp/working/iso/
 
 # clean
 sudo umount ${BASEDIR}/tmp/src/mnt
