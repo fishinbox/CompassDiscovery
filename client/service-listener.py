@@ -14,7 +14,7 @@ class MyListener(object):
  
 zeroconf = Zeroconf()
 listener = MyListener()
-browser = ServiceBrowser(zeroconf, "_ssh._tcp.local.", listener)
+browser = ServiceBrowser(zeroconf, "_compass_discovery._tcp.local.", listener)
 try:
     input("Press enter to exit...\n\n")
 finally:
