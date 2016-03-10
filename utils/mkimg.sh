@@ -1,7 +1,6 @@
 #!/bin/bash
 . ./image.conf
-SCRIPT=$(readlink -f "$0")
-BASEDIR=$(dirname ${SCRIPT})
+source path.rc
 
 # make directories
 mkdir -p ${BASEDIR}/tmp/src
