@@ -12,19 +12,23 @@ mkdir -p ${BASEDIR}/tmp/target
 get_dependencies ()
 {
 	app=${1}
-	curl -s ${tcz_repo}${app} -o ${BASEDIR}/tmp/src/tczs/${app}
 	#echo ${app} dependencies are ${app}.dep
+	if [ "$(find ${BASEDIR} -path */${app} )" != "" ]; then
+		return
+	fi
+	echo downloading ${app}
+	curl -s ${tcz_repo}${app} -o ${BASEDIR}/tmp/src/tczs/${app}
+
 	deplist=`curl -fs ${tcz_repo}${app}.dep 2>/dev/null`
-	echo ${app} deplist is
 	for depapp in $deplist; do
-		echo $depapp
 		get_dependencies $depapp 
 	done
 }
 
 
 mkdir -p ${BASEDIR}/tmp/src/iso
-curl -s ${release} -o ${BASEDIR}/tmp/src/iso/core.iso
+echo downloading iso
+curl ${release} -o ${BASEDIR}/tmp/src/iso/core.iso
 
 
 mkdir -p ${BASEDIR}/tmp/src/tczs
@@ -66,8 +70,8 @@ done
 sudo cp -rp ${BASEDIR}/tmp/working/squashfs-root/* ${BASEDIR}/tmp/working/initfs-root/
 
 # Copy scripts
-mkdir -p ${BASEDIR}/tmp/working/initfs-root/opt/compass/
-cp -r ${BASEDIR}/../client/* ${BASEDIR}/tmp/working/initfs-root/opt/compass/
+sudo mkdir -p ${BASEDIR}/tmp/working/initfs-root/opt/compass/
+sudo cp -r ${BASEDIR}/../client/* ${BASEDIR}/tmp/working/initfs-root/opt/compass/
 
 # rebuild initfs image
 sudo sh -c "find | cpio -o -H newc | gzip -9 > ${BASEDIR}/tmp/working/iso/${initfs}"
@@ -77,6 +81,6 @@ mkisofs -l -J -r -o ${BASEDIR}/tmp/target/core.iso ${BASEDIR}/tmp/working/iso/
 
 # clean
 sudo umount ${BASEDIR}/tmp/src/mnt
-rm -r ${BASEDIR}/tmp/working
+#sudo rm -r ${BASEDIR}/tmp/working
 
 
