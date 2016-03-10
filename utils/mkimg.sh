@@ -66,7 +66,8 @@ done
 sudo cp -rp ${BASEDIR}/tmp/working/squashfs-root/* ${BASEDIR}/tmp/working/initfs-root/
 
 # Copy scripts
-cp -r ${BASEDIR}/../client/* ${BASEDIR}/tmp/working/initfs-root/home/tc/
+mkdir -p ${BASEDIR}/tmp/working/initfs-root/opt/compass/
+cp -r ${BASEDIR}/../client/* ${BASEDIR}/tmp/working/initfs-root/opt/compass/
 
 # rebuild initfs image
 sudo sh -c "find | cpio -o -H newc | gzip -9 > ${BASEDIR}/tmp/working/iso/${initfs}"
