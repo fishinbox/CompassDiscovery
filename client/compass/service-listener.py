@@ -2,7 +2,9 @@ from six.moves import input
 from zeroconf import ServiceBrowser, Zeroconf
 import time
 import socket 
- 
+import netifaces
+
+
 class ServiceListener(object):
     service_names = []
  
@@ -25,7 +27,15 @@ try:
     service = zeroconf.get_service_info(service_type, name)
     print(socket.inet_ntoa(service.address))
     print(service.port)
-
+    # get net iface info
+    ifaces = netifaces.interfaces()
+    print(ifaces)
+    for iface in ifaces:
+        if iface.startswith('lo'):
+            continue
+        print(iface)
+        MAC = netifaces.ifaddresses(iface)[netifaces.AF_LINK][0]['addr']
+        print(MAC)
 finally:
     zeroconf.close()
     # for nicely shutdown
