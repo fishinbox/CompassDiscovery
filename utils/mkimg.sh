@@ -72,6 +72,9 @@ done
 sudo cp -rp ${BASEDIR}/tmp/working/squashfs-root/* ${BASEDIR}/tmp/working/initfs-root/
 
 # Copy scripts
+for i in $(find ${BASEDIR}/../client/compass -path *.pyc); do
+	rm $i
+done
 sudo cp -r ${BASEDIR}/../client/* ${BASEDIR}/tmp/working/initfs-root/opt/
 
 # rebuild initfs image
