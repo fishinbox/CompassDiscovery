@@ -78,7 +78,13 @@ sudo cp -r ${BASEDIR}/../client/* ${BASEDIR}/tmp/working/initfs-root/opt/
 sudo sh -c "find | cpio -o -H newc | gzip -9 > ${BASEDIR}/tmp/working/iso/${initfs}"
 
 # make ISO image
-mkisofs -l -J -r -o ${BASEDIR}/tmp/target/core.iso ${BASEDIR}/tmp/working/iso/
+sudo mkisofs -l -J -r \
+-no-emul-boot \
+-boot-load-size 4 \
+-boot-info-table \
+-b boot/isolinux/isolinux.bin \
+-c boot/isolinux/boot.cat \
+-o ${BASEDIR}/tmp/target/core.iso ${BASEDIR}/tmp/working/iso/
 
 # clean
 sudo umount ${BASEDIR}/tmp/src/mnt
