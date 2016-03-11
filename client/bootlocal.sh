@@ -8,3 +8,5 @@ for i in ${pylist[@]}; do
 	cd /tmp/$(basename $f .tar.gz)
 	sudo python setup.py install
 done
+
+sudo sh -c "python ./compass/agent_daemon.py start"
