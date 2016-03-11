@@ -1,4 +1,3 @@
-from six.moves import input
 from zeroconf import ServiceBrowser, Zeroconf
 import time
 import socket 
