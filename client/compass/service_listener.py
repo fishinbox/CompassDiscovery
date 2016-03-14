@@ -36,14 +36,9 @@ def get_server_info():
                 continue
             MAC = netifaces.ifaddresses(iface)[netifaces.AF_LINK][0]['addr']
             nics[iface]=MAC
-        #f = open('server_info', 'w')
-        #f.write(str(address)+"\n")
-        #f.write(str(port)+"\n")
-        #f.write(str(nics)+"\n")
-        #return (address, port, nics)
+        return (address, port, nics)
     finally:
         zeroconf.close()
         # for nicely shutdown
         time.sleep(1)
 
-#get_server_info()
