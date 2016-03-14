@@ -4,6 +4,7 @@
 #standard python libs
 import time
 import subprocess
+import socket
 
 #third party libs
 from daemon import runner
@@ -20,12 +21,21 @@ class App():
 
     def run(self):
         #TODO: get_server_info and send to compass server
+        address = '10.108.126.182'
+        port = 8889
+        nics = {'vmnet1': '00:50:56:c0:00:01', 'vmnet8': '00:50:56:c0:00:08', 'vboxnet2': '0a:00:27:00:00:02', 'vboxnet0': '0a:00:27:00:00:00', 'vboxnet1': '0a:00:27:00:00:01', 'eth0': '44:37:e6:a9:d8:30'}
+        clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        clientsocket.connect((address, port))
+        clientsocket.send(str(nics))
 
         while True:
-            #if no answer from compass server yet:
-            time.sleep(10)
-            #if receive reboot signal
-            #subprocess.call(['reboot'])
+            data = clientsocket.recv(256)
+            if data == 'reboot':
+                subprocess.call(['reboot'])
+                break
+            if data == '':
+                time.sleep(5)
+                continue
 
 
 app = App()
