@@ -1,4 +1,3 @@
-from six.moves import input
 from zeroconf import ServiceBrowser, Zeroconf
 import time
 import socket 
@@ -18,7 +17,7 @@ class ServiceListener(object):
 def get_server_info():
     zeroconf = Zeroconf()
     listener = ServiceListener()
-    service_type = "_compass_discovery._tcp.local."
+    service_type = "_compass_discovery1._tcp.local."
     browser = ServiceBrowser(zeroconf, service_type, listener)
 
     try:
