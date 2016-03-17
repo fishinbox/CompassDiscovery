@@ -9,4 +9,4 @@ for i in ${pylist[@]}; do
 	sudo python setup.py install
 done
 
-sudo sh -c "python /opt/compass/agent_daemon.py start"
+python /opt/compass/agent_daemon.py start
