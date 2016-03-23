@@ -5,6 +5,7 @@
 import time
 import subprocess
 import socket
+import requests
 
 #third party libs
 from daemon import runner
@@ -21,16 +22,15 @@ class App():
 
     def run(self):
         address, port, nics = get_server_info()
-        clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        clientsocket.connect((address, port))
-        clientsocket.send(str(nics))
+        url = 'http://'+address+':5000/servers'
+        r = requests.post(url, data=nics)
 
         while True:
-            data = clientsocket.recv(64)
-            if data == 'reboot':
+            r = requests.get(url)
+            if r.text == 'reboot':
                 subprocess.call(['reboot'])
                 break
-            if data == '':
+            else:
                 time.sleep(5)
                 continue
 
