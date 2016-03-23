@@ -22,7 +22,7 @@ class App():
 
     def run(self):
         address, port, nics = get_server_info()
-        url = 'http://'+address+':5000/servers'
+        url = 'http://'+address+':'+port+'/servers'
         r = requests.post(url, data=nics)
 
         while True:
