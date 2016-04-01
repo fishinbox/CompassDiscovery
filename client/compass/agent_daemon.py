@@ -24,6 +24,8 @@ import requests
 
 #third party libs
 from daemon import runner
+import netifaces
+
 
 
 class App():
@@ -40,9 +42,19 @@ class App():
         from common import Log
 
         Log.debug('enter run')
-        address, port, nics = get_server_info()
+        address, port = get_server_info()
+        # get net iface info
+        ifaces = netifaces.interfaces()
+        nics= {}
+        filtered = ['lo', 'dummy']
+        for iface in ifaces:
+            nicType = iface.rstrip('1234567890 ')
+            if nicType in filtered:
+                continue
+            MAC = netifaces.ifaddresses(iface)[netifaces.AF_LINK][0]['addr']
+            nics[iface]=MAC
         Log.debug((address, port, nics))
-        url = 'http://'+address+':'+port+'/servers'
+        url = 'http://%s:%s/servers' % (address, port)
         r = requests.post(url, data=nics)
 
         while True:
