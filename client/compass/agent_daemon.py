@@ -21,6 +21,7 @@ import time
 import subprocess
 import socket
 import requests
+import json
 
 #third party libs
 from daemon import runner
@@ -55,7 +56,8 @@ class App():
             nics[iface]=MAC
         Log.debug((address, port, nics))
         url = 'http://%s:%s/servers' % (address, port)
-        r = requests.post(url, data=nics)
+        headers = {'Content-Type': 'application/json'}
+        r = requests.post(url, data=json.dumps(nics), headers=headers)
 
         while True:
             r = requests.get(url)

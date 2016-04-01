@@ -10,7 +10,7 @@ def list_server():
 
 @app.route('/servers', methods=['POST'])
 def add_server():
-        nics = request.get_json()
+        nics = request.get_json(force=True)#new method since flask 0.10
         print str(nics)
 	return 'post ok!'
 
