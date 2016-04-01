@@ -10,7 +10,9 @@ def list_server():
 
 @app.route('/servers', methods=['POST'])
 def add_server():
+        nics = request.get_json()
+        print str(nics)
 	return 'post ok!'
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port='8888')
