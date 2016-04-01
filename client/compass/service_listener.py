@@ -35,9 +35,10 @@ def get_server_info():
     zeroconf = Zeroconf()
     listener = ServiceListener()
     service_type = "_compass_discovery._tcp.local."
-    Log.debug('enter browser')
+
     browser = ServiceBrowser(zeroconf, service_type, listener)
-    
+    Log.debug('enter browser')
+   
     try:
         Log.debug('enter try')
         while len(listener.service_names)<=0:
