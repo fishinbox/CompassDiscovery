@@ -18,3 +18,6 @@ done
 ifconfig
 
 python /opt/compass/agent_daemon.py start
+
+clear
+
