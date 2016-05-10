@@ -1,11 +1,31 @@
 #!/bin/bash
+# Copyright 2016 Network Intelligence Research Center, 
+# Beijing University of Posts and Telecommunications
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 . ./image.conf
 source path.rc
 
+TMPBASEDIR=/tmp/compass_discovery_agent
+SRCDIR=/tmp/compass_discovery_agent/src
+WORKDIR=/tmp/compass_discovery_agent/working
+TARGETDIR=/tmp/compass_discovery_agent/target
+
 # make directories
-mkdir -p ${BASEDIR}/tmp/src
-mkdir -p ${BASEDIR}/tmp/working 
-mkdir -p ${BASEDIR}/tmp/target
+mkdir -p ${SRCDIR}
+mkdir -p ${WORKDIR}
+mkdir -p ${TARGETDIR}
 
 # start download
 
@@ -13,11 +33,11 @@ get_dependencies ()
 {
 	app=${1}
 	#echo ${app} dependencies are ${app}.dep
-	if [ "$(find ${BASEDIR} -path */${app} )" != "" ]; then
+	if [ "$(find ${TMPBASEDIR} -path */${app} )" != "" ]; then
 		return
 	fi
 	echo downloading ${app}
-	curl -s ${tcz_repo}${app} -o ${BASEDIR}/tmp/src/tczs/${app}
+	curl -s ${tcz_repo}${app} -o ${SRCDIR}/tczs/${app}
 
 	deplist=`curl -fs ${tcz_repo}${app}.dep 2>/dev/null`
 	for depapp in $deplist; do
@@ -26,59 +46,59 @@ get_dependencies ()
 }
 
 
-mkdir -p ${BASEDIR}/tmp/src/iso
-if [ "$(find ${BASEDIR}/tmp/src/iso -path */core.iso)" == "" ]; then
+mkdir -p ${SRCDIR}/iso
+if [ "$(find ${SRCDIR}/iso -path */core.iso)" == "" ]; then
 	echo downloading iso
-	curl ${release} -o ${BASEDIR}/tmp/src/iso/core.iso
+	curl ${release} -o ${SRCDIR}/iso/core.iso
 fi
 
 
-mkdir -p ${BASEDIR}/tmp/src/tczs
+mkdir -p ${SRCDIR}/tczs
 IFS=',' read -ra DEPS <<< ${dependencies}
 for i in ${DEPS[@]}; do
 	get_dependencies $i
 done
 # start working
 # iso root
-mkdir -p ${BASEDIR}/tmp/src/mnt
-sudo mount -o loop ${BASEDIR}/tmp/src/iso/core.iso ${BASEDIR}/tmp/src/mnt
-mkdir -p ${BASEDIR}/tmp/working/iso
-sudo cp -rp ${BASEDIR}/tmp/src/mnt/* ${BASEDIR}/tmp/working/iso/
+mkdir -p ${SRCDIR}/mnt
+sudo mount -o loop ${SRCDIR}/iso/core.iso ${SRCDIR}/mnt
+mkdir -p ${WORKDIR}/iso
+sudo cp -rp ${SRCDIR}/mnt/* ${WORKDIR}/iso/
 
 # extract initfs
-mkdir -p ${BASEDIR}/tmp/working/initfs-root
-cd ${BASEDIR}/tmp/working/initfs-root
-sudo sh -c "zcat ${BASEDIR}/tmp/working/iso/${initfs} | cpio -i -H newc -d"
+mkdir -p ${WORKDIR}/initfs-root
+cd ${WORKDIR}/initfs-root
+sudo sh -c "zcat ${WORKDIR}/iso/${initfs} | cpio -i -H newc -d"
 
 echo 'doing squash'
-mkdir -p ${BASEDIR}/tmp/working/
+mkdir -p ${WORKDIR}
 # unsquash tcz
-ls ${BASEDIR}/tmp/src/tczs/
-for i in $( ls ${BASEDIR}/tmp/src/tczs/ ); do
-	if [ -f ${BASEDIR}/tmp/src/tczs/$i ]; then
+ls ${SRCDIR}/tczs/
+for i in $( ls ${SRCDIR}/tczs/ ); do
+	if [ -f ${SRCDIR}/tczs/$i ]; then
 		echo 
-		echo ${BASEDIR}/tmp/src/tczs/$i
-		unsquashfs -n -d ${BASEDIR}/tmp/working/squashfs-root/ -f ${BASEDIR}/tmp/src/tczs/$i
+		echo ${SRCDIR}/tczs/$i
+		unsquashfs -n -d ${WORKDIR}/squashfs-root/ -f ${SRCDIR}/tczs/$i
 	fi
 done
 
 # 2nd time extract
-for i in $(find ${BASEDIR} -path ${BASEDIR}/tmp/working/squashfs-root/*.tar.gz); do
+for i in $(find ${TMPBASEDIR} -path ${WORKDIR}/squashfs-root/*.tar.gz); do
 	echo $i
-	tar xf $i -C ${BASEDIR}/tmp/working/squashfs-root/
+	tar xf $i -C ${WORKDIR}/squashfs-root/
 done
 
 # Copyback
-sudo cp -rp ${BASEDIR}/tmp/working/squashfs-root/* ${BASEDIR}/tmp/working/initfs-root/
+sudo cp -rp ${WORKDIR}/squashfs-root/* ${WORKDIR}/initfs-root/
 
 # Copy scripts
 for i in $(find ${BASEDIR}/../client/compass -path *.pyc); do
 	rm $i
 done
-sudo cp -r ${BASEDIR}/../client/* ${BASEDIR}/tmp/working/initfs-root/opt/
+sudo cp -r ${BASEDIR}/../client/* ${WORKDIR}/initfs-root/opt/
 
 # rebuild initfs image
-sudo sh -c "find | cpio -o -H newc | gzip -9 > ${BASEDIR}/tmp/working/iso/${initfs}"
+sudo sh -c "find | cpio -o -H newc | gzip -9 > ${WORKDIR}/iso/${initfs}"
 
 # make ISO image
 sudo mkisofs -l -J -r \
@@ -87,10 +107,19 @@ sudo mkisofs -l -J -r \
 -boot-info-table \
 -b boot/isolinux/isolinux.bin \
 -c boot/isolinux/boot.cat \
--o ${BASEDIR}/tmp/target/core.iso ${BASEDIR}/tmp/working/iso/
+-o ${TARGETDIR}/core.iso ${WORKDIR}/iso/
+
+# backup
+ISODIR=${BASEDIR}/../iso
+if [[ -f ${ISOPATH} ]]; then
+    echo 'found existing core image, backing-up'
+    mv $ISODIR/core.iso ${ISODIR}/core.iso.backup.$(date +%Y%m%d_%H%M%S)
+fi
+# copy new ISO
+cp ${TARGETDIR}/core.iso $ISODIR/core.iso
 
 # clean
-sudo umount ${BASEDIR}/tmp/src/mnt
-#sudo rm -r ${BASEDIR}/tmp/working
+sudo umount ${SRCDIR}/mnt
+#sudo rm -r ${WORKDIR}
 
 
