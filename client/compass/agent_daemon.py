@@ -43,7 +43,6 @@ class App():
         from common import Log
 
         Log.debug('enter run')
-        address, port = get_server_info()
         # get net iface info
         ifaces = netifaces.interfaces()
         nics= {}
@@ -54,7 +53,12 @@ class App():
                 continue
             MAC = netifaces.ifaddresses(iface)[netifaces.AF_LINK][0]['addr']
             nics[iface]=MAC
-        Log.debug((address, port, nics))
+            addrs = netifaces.ifaddresses(iface)
+            Log.debug(addrs)
+        Log.debug(nics)
+        
+        address, port = get_server_info()
+        Log.debug((address, port))
         url = 'http://%s:%s/servers' % (address, port)
         headers = {'Content-Type': 'application/json'}
         r = requests.post(url, data=json.dumps(nics), headers=headers)
