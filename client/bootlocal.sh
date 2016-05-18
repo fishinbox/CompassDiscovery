@@ -1,6 +1,6 @@
 #!/usr/local/bin/bash
 # put other system startup commands here
-pylist=( setuptools netifaces pbr lockfile docutils six python-daemon requests)
+pylist=( setuptools netifaces pbr lockfile docutils six python-daemon requests enum34 zeroconf)
 for i in ${pylist[@]}; do
 	f=$(find /opt/py/ -path *$i*.tar.gz)
 	cd /tmp

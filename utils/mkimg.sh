@@ -81,6 +81,8 @@ pylist=(
 	six-1.10.0.tar.gz
 	python-daemon-2.1.1.tar.gz
 	requests-2.9.1.tar.gz
+	enum34-1.1.6.tar.gz
+	zeroconf-0.17.5.tar.gz
 )
 
 for i in ${pylist[@]}; do
