@@ -37,9 +37,9 @@ get_dependencies ()
 		return
 	fi
 	echo downloading ${app}
-	curl -s ${tcz_repo}${app} -o ${SRCDIR}/tczs/${app}
+	curl -s ${tcz_repo}${app} -o ${SRCDIR}/tczs/${app} --compressed
 
-	deplist=`curl -fs ${tcz_repo}${app}.dep 2>/dev/null`
+	deplist=`curl -fs ${tcz_repo}${app}.dep --compressed 2>/dev/null`
 	for depapp in $deplist; do
 		get_dependencies $depapp 
 	done
@@ -49,7 +49,7 @@ get_dependencies ()
 mkdir -p ${SRCDIR}/iso
 if [ "$(find ${SRCDIR}/iso -path */core.iso)" == "" ]; then
 	echo downloading iso
-	curl ${release} -o ${SRCDIR}/iso/core.iso
+	curl ${release} -o ${SRCDIR}/iso/core.iso --compressed
 fi
 
 
