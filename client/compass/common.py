@@ -14,5 +14,19 @@
 # limitations under the License.
 
 import logging
+import ConfigParser
+
 logging.basicConfig(filename='/tmp/agent.log',level=logging.DEBUG,format='%(asctime)s %(levelname)s %(message)s')
 Log = logging.getLogger(__name__)
+
+def getApiServer():
+	config = ConfigParser.RawConfigParser()
+	config.read('agent.conf')
+	try:
+		api_server = config.get('DEFAULT','api_server')
+		Log.info(api_server)
+		return api_server
+	except:
+		Log.debug('No api_server')
+		return None
+

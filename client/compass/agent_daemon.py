@@ -37,6 +37,8 @@ class App():
         self.stderr_path = '/tmp/agent_stderr'
         self.pidfile_path =  '/tmp/agent_daemon.pid'
         self.pidfile_timeout = 5
+	from common import getApiServer
+	self.api_server = getApiServer()
 
     def run(self):
         from service_listener import get_server_info
@@ -59,6 +61,7 @@ class App():
         
         address, port = get_server_info()
         Log.debug((address, port))
+	if self.api_server is None:
         url = 'http://%s:%s/servers' % (address, port)
         headers = {'Content-Type': 'application/json'}
         r = requests.post(url, data=json.dumps(nics), headers=headers)
