@@ -58,6 +58,37 @@ IFS=',' read -ra DEPS <<< ${dependencies}
 for i in ${DEPS[@]}; do
 	get_dependencies $i
 done
+
+# Get Python Dependencies
+download_py()
+{
+	mkdir -p ${SRCDIR}/py/
+	pygz=$1
+	py_repo='https://pypi.python.org/'
+	echo 'download and compact '$pygz
+	py=$(echo $pygz | sed -e 's/\-[0-9\.]*\.tar\.gz$//')
+	url=${py_repo}$(curl -s ${py_repo}simple/${py}/ --compressed | grep ${pygz}| sed -e 's/.*href\=\"\.\.\/\.\.\/\([^\"]*\)\#.*/\1/')
+	curl -s ${url} -o ${SRCDIR}/py/${pygz} --compressed
+	#advdef -z4 ${SRCDIR}/py/${pygz} -q
+}
+
+pylist=(
+	setuptools-19.6.tar.gz
+	netifaces-0.10.4.tar.gz
+	pbr-1.8.1.tar.gz
+	lockfile-0.12.2.tar.gz
+	docutils-0.12.tar.gz
+	six-1.10.0.tar.gz
+	python-daemon-2.1.1.tar.gz
+	requests-2.9.1.tar.gz
+)
+
+for i in ${pylist[@]}; do
+	download_py $i
+done
+
+
+
 # start working
 # iso root
 mkdir -p ${SRCDIR}/mnt
@@ -91,11 +122,14 @@ done
 # Copyback
 sudo cp -rp ${WORKDIR}/squashfs-root/* ${WORKDIR}/initfs-root/
 
-# Copy scripts
+# Clean pyc
 for i in $(find ${BASEDIR}/../client/compass -path *.pyc); do
 	rm $i
 done
+# Copy scripts
 sudo cp -r ${BASEDIR}/../client/* ${WORKDIR}/initfs-root/opt/
+# Copy Python Dependencies
+sudo cp -r ${SRCDIR}/py ${WORKDIR}/initfs-root/opt/
 
 # rebuild initfs image
 sudo sh -c "find | cpio -o -H newc | gzip -9 > ${WORKDIR}/iso/${initfs}"
