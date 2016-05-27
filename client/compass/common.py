@@ -1,4 +1,4 @@
-# Copyright 2016 Network Intelligence Research Center, 
+# Copyright 2016 Network Intelligence Research Center,
 # Beijing University of Posts and Telecommunications
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,12 @@
 
 import logging
 import ConfigParser
+import json
 
-logging.basicConfig(filename='/tmp/agent.log',level=logging.DEBUG,format='%(asctime)s %(levelname)s %(message)s')
+from daemon import runner
+
+
+logging.basicConfig(filename='/tmp/agent_%s.log' % __name__, level=logging.DEBUG,format='%(asctime)s %(levelname)s %(message)s')
 Log = logging.getLogger(__name__)
 
 def getApiServer():
@@ -30,3 +34,25 @@ def getApiServer():
 		Log.debug('No api_server')
 		return None
 
+class Configuration(object):
+    conf = {}
+    machine_info_file = '/tmp/machine_info.json'
+    service_info_file = '/tmp/service_info.json'
+    def Save(self):
+        try:
+            with open('config.json','w') as file:
+                json.dump(self.conf, file)
+        except:
+            print('Error on Save conf')
+
+    def Load(self):
+        try:
+            with open('config.json') as file:
+                json.load(self.conf, file)
+        except:
+            print('Error on Load conf')
+
+    def __init__(self):
+        super(type(self), self).__init__()
+
+CONF = Configuration()

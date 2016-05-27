@@ -9,6 +9,11 @@ for i in ${pylist[@]}; do
 	sudo python setup.py install
 done
 
+# compile and install lshw
+cd /opt/lshw
+make
+make install
+
 #wait for network config
 SEC=60
 while [ $SEC -gt 0 ] ; do
@@ -17,7 +22,7 @@ while [ $SEC -gt 0 ] ; do
 done                                       
 ifconfig
 
-python /opt/compass/agent_daemon.py start
+bash /opt/compass/start_agent.sh
 
 clear
 
