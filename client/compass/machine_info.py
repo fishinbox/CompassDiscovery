@@ -27,6 +27,7 @@ import netifaces
 
 # agent libs
 from common import *
+from lshw import getMachineInfo
 
 class MachineInfoApp():
 
@@ -39,7 +40,10 @@ class MachineInfoApp():
 
     def run(self):
         # One time lshw information parse and gathering
-        # TODO
+        machine_info = getMachineInfo()
+        with open(CONF.machine_info_file, 'w') as file:
+            json.dump(machine_info, file)
+
         while True:
             # Do lldp discovery in the loop
             # TODO
@@ -58,8 +62,8 @@ class MachineInfoApp():
                 MAC = netifaces.ifaddresses(iface)[netifaces.AF_LINK][0]['addr']
                 nics[iface]=MAC
                 addrs = netifaces.ifaddresses(iface)
-            with open(CONF.machine_info_file, 'w') as outfile:
-                json.dump(nics, outfile)
+            #with open(CONF.machine_info_file, 'w') as outfile:
+            #    json.dump(nics, outfile)
             time.sleep(1)
 
 machineinfo = MachineInfoApp()
