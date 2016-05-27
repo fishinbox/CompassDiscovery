@@ -89,7 +89,8 @@ for i in ${pylist[@]}; do
 	download_py $i
 done
 
-
+# Get lshw
+git clone -b ${lshw_version} ${lshw_repo} ${SRCDIR}/lshw
 
 # start working
 # iso root
@@ -132,6 +133,8 @@ done
 sudo cp -r ${BASEDIR}/../client/* ${WORKDIR}/initfs-root/opt/
 # Copy Python Dependencies
 sudo cp -r ${SRCDIR}/py ${WORKDIR}/initfs-root/opt/
+# Copy lshw
+sudo cp -r ${SRCDIR}/lshw ${WORKDIR}/initfs-root/opt/
 
 # rebuild initfs image
 sudo sh -c "find | cpio -o -H newc | gzip -9 > ${WORKDIR}/iso/${initfs}"
