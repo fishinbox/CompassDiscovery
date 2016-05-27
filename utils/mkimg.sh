@@ -83,6 +83,7 @@ pylist=(
 	requests-2.9.1.tar.gz
 	enum34-1.1.6.tar.gz
 	zeroconf-0.17.5.tar.gz
+    lxml-3.6.0.tar.gz
 )
 
 for i in ${pylist[@]}; do
