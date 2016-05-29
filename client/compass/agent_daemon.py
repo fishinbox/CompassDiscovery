@@ -24,7 +24,6 @@ import requests
 import json
 
 # third party libs
-from daemon import runner
 import netifaces
 
 # agent libs
