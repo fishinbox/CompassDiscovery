@@ -38,6 +38,8 @@ class Configuration(object):
     conf = {}
     machine_info_file = '/tmp/machine_info.json'
     service_info_file = '/tmp/service_info.json'
+    def lldp_info_file(self, interface):
+        return '/tmp/lldp_info.%s.json' % interface
     def Save(self):
         try:
             with open('config.json','w') as file:

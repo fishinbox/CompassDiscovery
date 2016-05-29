@@ -46,9 +46,21 @@ class MachineInfoApp():
 
         while True:
             # Do lldp discovery in the loop
-            # TODO
+            for network in machine_info['network']['devices']:
+                interface = network['name']
+                try:
+                    with open(CONF.lldp_info_file(interface)) as file:
+                        switch = json.load(file)
+                        network['switch'] = switch
+                except:
+                    # Note(ZZR): there may not be all lldp_info for
+                    # each interface, ignoreing the exception
+                    pass
             # and update the machine info JSON file
-            # TODO
+            with open(CONF.machine_info_file, 'w') as file:
+                json.dump(machine_info, file)
+
+
 
 
             # get net iface info
