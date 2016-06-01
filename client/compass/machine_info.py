@@ -63,6 +63,7 @@ class MachineInfoApp():
 
 
 
+            '''
             # get net iface info
             ifaces = netifaces.interfaces()
             nics= {}
@@ -76,6 +77,7 @@ class MachineInfoApp():
                 addrs = netifaces.ifaddresses(iface)
             #with open(CONF.machine_info_file, 'w') as outfile:
             #    json.dump(nics, outfile)
+            '''
             time.sleep(1)
 
 machineinfo = MachineInfoApp()

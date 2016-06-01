@@ -23,16 +23,31 @@ from daemon import runner
 logging.basicConfig(filename='/tmp/agent_%s.log' % __name__, level=logging.DEBUG,format='%(asctime)s %(levelname)s %(message)s')
 Log = logging.getLogger(__name__)
 
-def getApiServer():
+
+def getApiUrlFromServiceInfo():
+    try:
+        with open(CONF.service_info_file) as data_file:
+            d = json.load(data_file)
+            return 'http://%s:%s/servers' % (d['host'], d['port'])
+    except:
+        return None
+
+
+def getApiUrlFromConfig():
 	config = ConfigParser.RawConfigParser()
 	config.read('agent.conf')
 	try:
 		api_server = config.get('DEFAULT','api_server')
-		Log.info(api_server)
-		return api_server
+		api_port = config.get('DEFAULT','api_port')
+		return 'http://%s:%s/servers' % (api_server, api_port)
 	except:
 		Log.debug('No api_server')
 		return None
+
+
+def getApiUrl(fromConfig=False):
+    return getApiUrlFromConfig() if fromConfig else getApiUrlFromServiceInfo()
+
 
 class Configuration(object):
     conf = {}

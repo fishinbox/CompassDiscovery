@@ -30,6 +30,8 @@ import netifaces
 from common import *
 
 
+
+
 class DiscoveryAgentApp():
 
     def __init__(self):
@@ -38,24 +40,28 @@ class DiscoveryAgentApp():
         self.stderr_path = '/tmp/agent_stderr'
         self.pidfile_path =  '/tmp/agent_daemon.pid'
         self.pidfile_timeout = 5
-    	self.api_server = getApiServer()
 
     def run(self):
         from common import Log
         while True:
             try:
-                # TODO Logic change, using service info as primary and configuration file as fallback
-                if self.api_server is None:
-                    with open(CONF.service_info_file) as data_file:
-                        d = json.load(data_file)
-                        url = 'http://%s:%s/servers' % (d['host'], d['port'])
-                else:
-                    url = 'http://%s:80/servers' % (self.api_server)
+                # using service info as primary and configuration file as fallback
+                url = getApiUrl()
+                if not url:
+                    url = getApiUrl(fromConfig=True)
+                print('url get')
                 headers = {'Content-Type': 'application/json'}
+                # get machine info
+                machine_info = {}
+                with open(CONF.machine_info_file) as file:
+                    machine_info = json.load(file)
+                print('machine info get')
 
                 # submit machine information to the Compass Service
                 # TODO
-                r = requests.post(url, data=json.dumps(nics), headers=headers)
+                r = requests.post(url, data=json.dumps(machine_info), headers=headers)
+                print('posted')
+
                 # Again and again
                 # wait for n Seconds
                 # TODO
@@ -65,7 +71,9 @@ class DiscoveryAgentApp():
                 #    subprocess.call(['reboot'])
                 #    break
             except:
-                pass
+                print('bug at run')
+                import traceback
+                traceback.print_exc()
             finally:
                 time.sleep(5)
 
