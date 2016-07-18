@@ -28,7 +28,7 @@ def getApiUrlFromServiceInfo():
     try:
         with open(CONF.service_info_file) as data_file:
             d = json.load(data_file)
-            return 'http://%s:%s/servers' % (d['host'], d['port'])
+            return 'http://%s:%s/machines' % (d['host'], d['port'])
     except:
         return None
 
@@ -39,7 +39,7 @@ def getApiUrlFromConfig():
 	try:
 		api_server = config.get('DEFAULT','api_server')
 		api_port = config.get('DEFAULT','api_port')
-		return 'http://%s:%s/servers' % (api_server, api_port)
+		return 'http://%s:%s/machines' % (api_server, api_port)
 	except:
 		Log.debug('No api_server')
 		return None

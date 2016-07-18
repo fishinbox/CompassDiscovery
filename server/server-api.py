@@ -3,12 +3,12 @@ from flask import request
 app = Flask(__name__)
 
 
-@app.route('/servers', methods=['GET'])
+@app.route('/machines', methods=['GET'])
 def list_server():
 	"""Get machine."""
 	return 'eth0: 00:00:00:00:00:00'
 
-@app.route('/servers', methods=['POST'])
+@app.route('/machines', methods=['POST'])
 def add_server():
         nics = request.get_json(force=True)#new method since flask 0.10
         print str(nics)
