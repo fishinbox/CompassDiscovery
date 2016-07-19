@@ -49,6 +49,17 @@ def getApiUrl(fromConfig=False):
     return getApiUrlFromConfig() if fromConfig else getApiUrlFromServiceInfo()
 
 
+#owner_id is a boot param configured by cobbler "kopts"
+def getOwnerId():
+    fh = open("/proc/cmdline")
+    str = fh.read()
+    params = str.split(" ")
+    for param in params:
+        if "owner_id" in param:
+            return int(param[9:])
+
+
+
 class Configuration(object):
     conf = {}
     machine_info_file = '/tmp/machine_info.json'

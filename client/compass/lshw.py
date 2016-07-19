@@ -163,15 +163,6 @@ def getProcessor(inventory):
         'devices': devices
     }
 
-#owner_id is a bootparam configured by cobbler "kopts"
-def getOwnerID():
-    fh = open("/proc/cmdline")
-    str = fh.read()
-    params = str.split(" ")
-    for param in params:
-        if "owner_id" in param:
-            return param[9:]
-
 
 def getMachineInfo():
     lshw = Popen(['lshw', '-xml', '-numeric'], stdout=PIPE).communicate()[0]
@@ -180,6 +171,6 @@ def getMachineInfo():
         'processor': getProcessor(lshw),
         'memory': getMemory(lshw),
         'disk': getDisk(lshw),
-        'network': getNetwork(lshw),
+        'network': getNetwork(lshw)
     }
 
