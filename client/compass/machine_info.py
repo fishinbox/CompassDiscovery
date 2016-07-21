@@ -41,8 +41,15 @@ class MachineInfoApp():
     def run(self):
         # One time lshw information parse and gathering
         machine_info = getMachineInfo()
+        
+        mac = machine_info['network']['devices'][0]['mac']
+        machine_info_all = {
+            "owner_id": getOwnerId(),
+            "mac": mac,
+            "machine_attribute": machine_info
+        }
         with open(CONF.machine_info_file, 'w') as file:
-            json.dump(machine_info, file)
+            json.dump(machine_info_all, file)
 
         while True:
             # Do lldp discovery in the loop
@@ -58,7 +65,7 @@ class MachineInfoApp():
                     pass
             # and update the machine info JSON file
             with open(CONF.machine_info_file, 'w') as file:
-                json.dump(machine_info, file)
+                json.dump(machine_info_all, file)
 
 
 
